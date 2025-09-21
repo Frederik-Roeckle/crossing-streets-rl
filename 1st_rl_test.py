@@ -10,7 +10,7 @@ gym.register(
     max_episode_steps=300,  # Prevent infinite episodes
 )
 
-env = gym.make("gymnasium_env/GridWorld-v0")
+env = gym.make("gymnasium_env/GridWorld-v0", render_mode="human")
 
 # This will catch many common issues
 # try:
@@ -34,6 +34,7 @@ while not episode_over:
     observation, reward, terminated, truncated, info = env.step(action)
 
     print(info)
+    env.render()
 
     total_reward += reward
     episode_over = terminated or truncated
