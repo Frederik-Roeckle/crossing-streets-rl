@@ -12,7 +12,7 @@ from tqdm import tqdm
 gym.register(
     id="gymnasium_env/GridWorld-v0",
     entry_point="GridWorldEnvironment:GridWorldEnv",
-    max_episode_steps=150,  # Prevent infinite episodes
+    max_episode_steps=500,  # Prevent infinite episodes
 )
 
 env = gym.make("gymnasium_env/GridWorld-v0", render_mode="human")

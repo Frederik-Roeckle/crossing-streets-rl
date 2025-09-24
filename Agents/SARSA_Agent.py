@@ -77,6 +77,8 @@ class SARSAAgent(Agent):
             tuple(int(x) for x in obs["target"]),
             tuple(int(x) for x in obs["traffic_light_1_position"]),
             tuple(int(x) for x in obs["traffic_light_2_position"]),
+            tuple(int(x) for x in obs["traffic_light_3_position"]),
             int(obs["traffic_light_1_current_light"]),
-            int(obs["traffic_light_2_current_light"])
+            int(obs["traffic_light_2_current_light"]),
+            int(obs["traffic_light_3_current_light"])
         )

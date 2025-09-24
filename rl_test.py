@@ -27,7 +27,7 @@ agent = SARSAAgent(
     epsilon_decay=-1,
     final_epsilon=-1,
 )
-agent.load_agent_state("sarsa_agent.pkl")
+agent.load_agent_state("sarsa_agent_final.pkl")
 
 for _ in range(5):
 

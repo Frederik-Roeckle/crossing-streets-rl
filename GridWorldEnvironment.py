@@ -155,6 +155,14 @@ class GridWorldEnv(gym.Env):
         self.traffic_light_2_timing, self.traffic_light_2_current_light = self.traffic_light_step(initial_timing_light_2, 0)
         self.traffic_light_3_timing, self.traffic_light_3_current_light = self.traffic_light_step(initial_timing_light_3, 0)
 
+        # Environment is fixed, only light_timing is stochastic
+        if static_scene:
+            self.agent_position = np.array([0, 0])
+            self.target_position = np.array([2, self.size_height-1])
+            self.traffic_light_1_position = np.array([1, 1])
+            self.traffic_light_2_position = np.array([1, 77])
+            self.traffic_light_3_position = np.array([1, 53])
+
         observation = self._get_obs()
         info = self._get_info()
 
