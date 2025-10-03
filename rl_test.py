@@ -6,19 +6,19 @@ from Agents.SARSA_Agent import SARSAAgent
 
 gym.register(
     id="gymnasium_env/GridWorld-v0",
-    entry_point="GridWorldEnvironment:GridWorldEnv",
-    max_episode_steps=100,  # Prevent infinite episodes
+    entry_point="Environments.GridWorldMannheim:GWMannheimEnv",
+    max_episode_steps=150,  # Prevent infinite episodes
 )
 
 env = gym.make("gymnasium_env/GridWorld-v0", render_mode="human")
 
-agent = QLearningAgent(
-    env=env,
-    learning_rate=-1,
-    initial_epsilon=-1,
-    epsilon_decay=-1,
-    final_epsilon=-1,
-)
+# agent = QLearningAgent(
+#     env=env,
+#     learning_rate=-1,
+#     initial_epsilon=-1,
+#     epsilon_decay=-1,
+#     final_epsilon=-1,
+# )
 
 agent = SARSAAgent(
     env=env,
@@ -27,7 +27,7 @@ agent = SARSAAgent(
     epsilon_decay=-1,
     final_epsilon=-1,
 )
-agent.load_agent_state("sarsa_agent_final.pkl")
+agent.load_agent_state("sarsa_agent.pkl")
 
 for _ in range(5):
 
