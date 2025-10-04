@@ -11,6 +11,6 @@ COPY Environments/ /src/Environments
 COPY rl_test.py /src/
 COPY rl_train.py /src/
 
-
+RUN mkdir -p /src/output
 
 CMD ["python", "rl_train.py"]
