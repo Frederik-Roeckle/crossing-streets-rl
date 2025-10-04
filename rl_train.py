@@ -103,6 +103,7 @@ axs[2].set_xlabel("Step")
 
 plt.tight_layout()
 plt.show()
+plt.savefig("./output/q_learning_training_metrics.png")
 
 # agent.save_agent_state("q_learning_agent.pkl")
 # agent.save_q_table("q_learning_table.pkl")
