@@ -80,7 +80,13 @@ class QLearningAgent(Agent):
             tuple(obs["target"]),
             tuple(obs["traffic_light_1_position"]),
             tuple(obs["traffic_light_2_position"]),
+            tuple(obs["traffic_light_2b_position"]),
+            tuple(obs["traffic_light_3_position"]),
+            tuple(obs["street_crossing_3_position"]),
             obs["traffic_light_1_current_light"],
-            obs["traffic_light_2_current_light"]
+            obs["traffic_light_2_current_light"],
+            obs["traffic_light_2b_current_light"],
+            obs["traffic_light_3_current_light"],
+            obs["street_crossing_3_status"]
         )
     

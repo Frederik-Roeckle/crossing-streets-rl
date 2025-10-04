@@ -42,7 +42,7 @@ class Crossings:
 
 class GWMannheimEnv(gym.Env):
 
-    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 10}
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 5}
 
     def __init__(self, render_mode=None, size=28):
         # Dimension of Grid Environment (3 x size(length))
@@ -55,6 +55,7 @@ class GWMannheimEnv(gym.Env):
 
         # Init Agent and Target Location
         self.agent_position = np.array([-1, -1])
+        self.agent_illegal_move = 0.0
         self.target_position = np.array([-1, -1])
 
         self.traffic_light_1_position = np.array([-1, -1])
@@ -91,32 +92,32 @@ class GWMannheimEnv(gym.Env):
                 dtype=int
             ),
             "traffic_light_1_position": gym.spaces.Box(
-                low = np.array([1, 0]),
-                high = np.array([1, self.size_height -1]),
+                low = np.array([0, 0]),
+                high =np.array([self.size_width -1, self.size_height -1]),
                 shape = (2, ),
                 dtype = int
             ),
             "traffic_light_2_position": gym.spaces.Box(
-                low = np.array([1, 0]),
-                high = np.array([1, self.size_height -1]),
+                low = np.array([0, 0]),
+                high = np.array([self.size_width -1, self.size_height -1]),
                 shape = (2, ),
                 dtype = int
             ),
             "traffic_light_2b_position": gym.spaces.Box(
-                low = np.array([1, 0]),
-                high = np.array([1, self.size_height -1]),
+                low = np.array([0, 0]),
+                high = np.array([self.size_width -1, self.size_height -1]),
                 shape = (2, ),
                 dtype = int
             ),
             "traffic_light_3_position": gym.spaces.Box(
-                low = np.array([1, 0]),
-                high = np.array([1, self.size_height -1]),
+                low = np.array([0, 0]),
+                high = np.array([self.size_width -1, self.size_height -1]),
                 shape = (2, ),
                 dtype = int
             ),
             "street_crossing_3_position": gym.spaces.Box(
-                low = np.array([1, 0]),
-                high = np.array([1, self.size_height -1]),
+                low = np.array([0, 0]),
+                high = np.array([self.size_width -1, self.size_height -1]),
                 shape = (2, ),
                 dtype = int
             ),
@@ -174,7 +175,8 @@ class GWMannheimEnv(gym.Env):
     def _get_info(self):
         """Provide auxillary information for the debugger"""
         return {
-            "distance": np.linalg.norm(self.agent_position - self.target_position, ord=1)
+            "distance": np.linalg.norm(self.agent_position - self.target_position, ord=1),
+            "illegality": self.agent_illegal_move,
         }
     
 
@@ -208,6 +210,8 @@ class GWMannheimEnv(gym.Env):
         self.traffic_light_3_timing, self.traffic_light_3_current_light = self.traffic_light_step(initial_timing_light_3, 0, tl="TL3")
 
         self.street_crossing_3_status = 1 if self.np_random.random() < Crossings.SC_3_CHANCE_2_CROSS else 0
+
+        self.agent_illegal_move = 0.0
         
         observation = self._get_obs()
         info = self._get_info()
@@ -238,6 +242,8 @@ class GWMannheimEnv(gym.Env):
 
 
     def step(self, action):
+        # agent_illegal_move helps visualizing illegal moves
+        self.agent_illegal_move = 0.0
         # each step longer gets a slight negative reward
         reward = -.1
         # Translate action to direction
@@ -254,6 +260,7 @@ class GWMannheimEnv(gym.Env):
             else:   # The agent wants to illegally cross the street
                 direction = self._action_to_direction[Actions.ACTION_WAIT.value]  
                 reward -= 10
+                self.agent_illegal_move += 0.8
         
         # Agent Move LEFT/RIGHT -> check StreetCrossing and TL2b
         if ((action == Actions.ACTION_MOVE_LEFT.value or action == Actions.ACTION_MOVE_RIGHT.value) and self.agent_position[1] == 2):
@@ -261,11 +268,13 @@ class GWMannheimEnv(gym.Env):
                 if self.traffic_light_2b_current_light == 0:    # illegal move
                     direction = self._action_to_direction[Actions.ACTION_WAIT.value]  
                     reward -= 10
+                    self.agent_illegal_move += 0.8
             
             if np.array_equal(self.agent_position + direction, self.street_crossing_3_position):  # SC check
                 if self.street_crossing_3_status == 0:          # illegal move
                     direction = self._action_to_direction[Actions.ACTION_WAIT.value]  
                     reward -= 10
+                    self.agent_illegal_move += 0.8
 
         
         # Move agent to new position and clip if moves outside of space
@@ -273,6 +282,7 @@ class GWMannheimEnv(gym.Env):
         
         # if clipping was necessary, then penalty for out of bound
         if not np.array_equal((self.agent_position + direction), self.agent_new_position):
+            self.agent_illegal_move += .2
             reward -= 1
         
         # If Agent moves closer to Target, gets reward
@@ -353,7 +363,7 @@ class GWMannheimEnv(gym.Env):
         # draw the agent
         pygame.draw.rect(
             canvas,
-            (0, 0, 255),
+            ((25*self.agent_illegal_move), 0, 255),
             pygame.Rect(
                 pix_size[0] * self.agent_position[0],
                 pix_size[1] * self.agent_position[1],

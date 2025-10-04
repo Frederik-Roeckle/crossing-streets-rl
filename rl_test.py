@@ -12,22 +12,23 @@ gym.register(
 
 env = gym.make("gymnasium_env/GridWorld-v0", render_mode="human")
 
-# agent = QLearningAgent(
-#     env=env,
-#     learning_rate=-1,
-#     initial_epsilon=-1,
-#     epsilon_decay=-1,
-#     final_epsilon=-1,
-# )
-
-agent = SARSAAgent(
+agent = QLearningAgent(
     env=env,
     learning_rate=-1,
     initial_epsilon=-1,
     epsilon_decay=-1,
     final_epsilon=-1,
 )
-agent.load_agent_state("sarsa_agent.pkl")
+agent.load_agent_state("q_agent.pkl")
+
+# agent = SARSAAgent(
+#     env=env,
+#     learning_rate=-1,
+#     initial_epsilon=-1,
+#     epsilon_decay=-1,
+#     final_epsilon=-1,
+# )
+# agent.load_agent_state("sarsa_agent.pkl")
 
 for _ in range(5):
 

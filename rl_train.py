@@ -10,31 +10,23 @@ from tqdm import tqdm
 
 # Register the environment so we can create it with gym.make()
 gym.register(
-    id="gymnasium_env/GridWorld-v0",
-    entry_point="GridWorldEnvironment:GridWorldEnv",
-    max_episode_steps=500,  # Prevent infinite episodes
+    id="gymnasium_env/GridWorld-Mannheim",
+    entry_point="Environments.GridWorldMannheim:GWMannheimEnv",
+    max_episode_steps=150,  # Prevent infinite episodes
 )
 
-env = gym.make("gymnasium_env/GridWorld-v0", render_mode="human")
+env = gym.make("gymnasium_env/GridWorld-Mannheim", render_mode="human")
 
 # Training hyperparameters
-learning_rate = 0.01        # How fast to learn (higher = faster but less stable)
-n_episodes = 80000         # Number of hands to practice
+learning_rate = 0.1        # How fast to learn (higher = faster but less stable)
+n_episodes = 500000         # Number of hands to practice
 start_epsilon = 1.0         # Start with 100% random actions
-epsilon_decay = start_epsilon / (n_episodes / 2)  # Reduce exploration over time
+epsilon_decay = start_epsilon / (n_episodes / 0.8)  # Reduce exploration over time
 final_epsilon = 0.1         # Always keep some exploration
 
 env = gym.wrappers.RecordEpisodeStatistics(env, buffer_length=n_episodes)
 
 agent = QLearningAgent(
-    env=env,
-    learning_rate=learning_rate,
-    initial_epsilon=start_epsilon,
-    epsilon_decay=epsilon_decay,
-    final_epsilon=final_epsilon,
-)
-
-agent = SARSAAgent(
     env=env,
     learning_rate=learning_rate,
     initial_epsilon=start_epsilon,
@@ -53,12 +45,8 @@ for episode in tqdm(range(n_episodes)):
         # Take the action and see what happens
         next_observation, reward, terminated, truncated, info = env.step(action)
 
-        # for SARAS
-        next_action = agent.get_action(next_observation)
-        agent.update(observation, action, reward, terminated, next_observation, next_action)
-
         # update agents for QLearning
-        # agent.update(observation, action, reward, terminated, next_observation, next_action)
+        agent.update(observation, action, reward, terminated, next_observation)
 
         # print(info)
         # env.render()
@@ -119,8 +107,8 @@ plt.show()
 # agent.save_agent_state("q_learning_agent.pkl")
 # agent.save_q_table("q_learning_table.pkl")
 
-agent.save_agent_state("sarsa_agent.pkl")
-agent.save_q_table("q_learning_table.pkl")
+agent.save_agent_state("q_agent.pkl")
+agent.save_q_table("q_learning_q_table.pkl")
 
 # print(f"Episode finished! Total reward: {total_reward}")
 env.close()
