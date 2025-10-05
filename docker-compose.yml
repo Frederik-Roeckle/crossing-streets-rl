@@ -7,3 +7,5 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - MPLBACKEND=Agg
+    mem_limit: 6g
+    memswap_limit: 12g
