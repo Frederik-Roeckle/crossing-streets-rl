@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  rl-training:
+    build: .
+    volumes:
+      - ./output:/src/output
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MPLBACKEND=Agg

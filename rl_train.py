@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from gymnasium.utils.env_checker import check_env
 from Agents.Q_Learning_Agent import QLearningAgent
-from Agents.SARSA_Agent import SARSAAgent
 from tqdm import tqdm
 
 
@@ -15,11 +14,11 @@ gym.register(
     max_episode_steps=150,  # Prevent infinite episodes
 )
 
-env = gym.make("gymnasium_env/GridWorld-Mannheim", render_mode="human")
+env = gym.make("gymnasium_env/GridWorld-Mannheim", render_mode=None)
 
 # Training hyperparameters
 learning_rate = 0.1        # How fast to learn (higher = faster but less stable)
-n_episodes = 1000         # Number of hands to practice
+n_episodes = 100        # Number of hands to practice
 start_epsilon = 1.0         # Start with 100% random actions
 epsilon_decay = start_epsilon / (n_episodes / 0.8)  # Reduce exploration over time
 final_epsilon = 0.1         # Always keep some exploration
