@@ -5,6 +5,16 @@ from matplotlib import pyplot as plt
 from gymnasium.utils.env_checker import check_env
 from Agents.Q_Learning_Agent import QLearningAgent
 from tqdm import tqdm
+import logging
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler('./output/training.log')  # Saves to file
+    ]
+)
+logger = logging.getLogger(__name__)
 
 
 # Register the environment so we can create it with gym.make()
@@ -54,6 +64,7 @@ for episode in tqdm(range(n_episodes)):
         episode_over = terminated or truncated
         observation = next_observation
     agent.decay_epsilon()
+    logger.info(len(agent.q_values))
 
 print("Training finished")
 

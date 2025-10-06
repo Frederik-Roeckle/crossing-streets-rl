@@ -30,7 +30,7 @@ agent.load_agent_state_json("q_agent.json")
 # )
 # agent.load_agent_state("sarsa_agent.pkl")
 
-for _ in range(5):
+for _ in range(10):
 
     observation, info = env.reset()
     episode_over = False
