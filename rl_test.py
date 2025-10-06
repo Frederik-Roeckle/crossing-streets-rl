@@ -19,7 +19,7 @@ agent = QLearningAgent(
     epsilon_decay=-1,
     final_epsilon=-1,
 )
-agent.load_agent_state("q_agent.pkl")
+agent.load_agent_state_json("q_agent.json")
 
 # agent = SARSAAgent(
 #     env=env,

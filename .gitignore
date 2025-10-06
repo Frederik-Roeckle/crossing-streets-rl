@@ -1,5 +1,6 @@
 __pycache__/
 .venv/
 *.pkl
+*.json
 *.docx
 output/*

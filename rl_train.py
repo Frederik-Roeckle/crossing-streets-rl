@@ -18,7 +18,7 @@ env = gym.make("gymnasium_env/GridWorld-Mannheim", render_mode=None)
 
 # Training hyperparameters
 learning_rate = 0.1        # How fast to learn (higher = faster but less stable)
-n_episodes = 100000        # Number of hands to practice
+n_episodes = 1000          # Number of hands to practice
 start_epsilon = 1.0         # Start with 100% random actions
 epsilon_decay = start_epsilon / (n_episodes / 0.9)  # Reduce exploration over time
 final_epsilon = 0.01         # Make greedy
@@ -58,8 +58,8 @@ for episode in tqdm(range(n_episodes)):
 print("Training finished")
 
 print("saving agent")
-agent.save_agent_state("./output/q_agent.pkl")
-agent.save_q_table("./output/q_learning_q_table.pkl")
+agent.save_agent_state_json("./output/q_agent.json")
+# agent.save_q_table_json("./output/q_learning_q_table.pkl")
 print("agent saved")
 
 
