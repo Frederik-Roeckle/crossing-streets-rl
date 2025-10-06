@@ -18,10 +18,10 @@ env = gym.make("gymnasium_env/GridWorld-Mannheim", render_mode=None)
 
 # Training hyperparameters
 learning_rate = 0.1        # How fast to learn (higher = faster but less stable)
-n_episodes = 100        # Number of hands to practice
+n_episodes = 100000        # Number of hands to practice
 start_epsilon = 1.0         # Start with 100% random actions
-epsilon_decay = start_epsilon / (n_episodes / 0.8)  # Reduce exploration over time
-final_epsilon = 0.1         # Always keep some exploration
+epsilon_decay = start_epsilon / (n_episodes / 0.9)  # Reduce exploration over time
+final_epsilon = 0.01         # Make greedy
 
 env = gym.wrappers.RecordEpisodeStatistics(env, buffer_length=n_episodes)
 
@@ -55,13 +55,62 @@ for episode in tqdm(range(n_episodes)):
         observation = next_observation
     agent.decay_epsilon()
 
-def get_moving_avgs(arr, window, convolution_mode):
-    """Compute moving average to smooth noisy data."""
-    return np.convolve(
-        np.array(arr).flatten(),
-        np.ones(window),
-        mode=convolution_mode
-    ) / window
+print("Training finished")
+
+print("saving agent")
+agent.save_agent_state("./output/q_agent.pkl")
+agent.save_q_table("./output/q_learning_q_table.pkl")
+print("agent saved")
+
+
+
+def get_moving_avgs_safe(arr, window, convolution_mode):
+    """Memory-safe moving average calculation."""
+    arr = np.array(arr).flatten()
+    
+    # Safety checks
+    if len(arr) == 0:
+        return np.array([])
+    
+    # If array is too large, subsample it
+    if len(arr) > 100000:
+        print(f"Warning: Large array ({len(arr)} elements), subsampling...")
+        # Take every nth element to reduce size
+        step = len(arr) // 50000
+        arr = arr[::step]
+    
+    if window > len(arr):
+        window = len(arr)
+    
+    if window <= 0:
+        return arr
+    
+    # Use memory-efficient calculation for large arrays
+    if len(arr) > 50000:
+        return moving_average_chunked(arr, window)
+    else:
+        return np.convolve(arr, np.ones(window), mode=convolution_mode) / window
+
+def moving_average_chunked(arr, window):
+    """Chunked moving average to save memory"""
+    if len(arr) < window:
+        return np.array([np.mean(arr)])
+    
+    # Calculate moving average in chunks
+    result = []
+    for i in range(len(arr) - window + 1):
+        chunk_mean = np.mean(arr[i:i + window])
+        result.append(chunk_mean)
+    
+    return np.array(result)
+
+# def get_moving_avgs(arr, window, convolution_mode):
+#     """Compute moving average to smooth noisy data."""
+#     return np.convolve(
+#         np.array(arr).flatten(),
+#         np.ones(window),
+#         mode=convolution_mode
+#     ) / window
 
 # Smooth over a 500-episode window
 rolling_length = 500
@@ -69,7 +118,7 @@ fig, axs = plt.subplots(ncols=3, figsize=(12, 5))
 
 # Episode rewards (win/loss performance)
 axs[0].set_title("Episode rewards")
-reward_moving_average = get_moving_avgs(
+reward_moving_average = get_moving_avgs_safe(
     env.return_queue,
     rolling_length,
     "valid"
@@ -80,7 +129,7 @@ axs[0].set_xlabel("Episode")
 
 # Episode lengths (how many actions per hand)
 axs[1].set_title("Episode lengths")
-length_moving_average = get_moving_avgs(
+length_moving_average = get_moving_avgs_safe(
     env.length_queue,
     rolling_length,
     "valid"
@@ -91,7 +140,7 @@ axs[1].set_xlabel("Episode")
 
 # Training error (how much we're still learning)
 axs[2].set_title("Training Error")
-training_error_moving_average = get_moving_avgs(
+training_error_moving_average = get_moving_avgs_safe(
     agent.training_error,
     rolling_length,
     "same"
@@ -104,11 +153,4 @@ plt.tight_layout()
 plt.show()
 plt.savefig("./output/q_learning_training_metrics.png")
 
-# agent.save_agent_state("q_learning_agent.pkl")
-# agent.save_q_table("q_learning_table.pkl")
-
-agent.save_agent_state("./output/q_agent.pkl")
-agent.save_q_table("./output/q_learning_q_table.pkl")
-
-# print(f"Episode finished! Total reward: {total_reward}")
 env.close()
