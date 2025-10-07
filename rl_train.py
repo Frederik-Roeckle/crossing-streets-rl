@@ -28,10 +28,10 @@ env = gym.make("gymnasium_env/GridWorld-Mannheim", render_mode=None)
 
 # Training hyperparameters
 learning_rate = 0.1        # How fast to learn (higher = faster but less stable)
-n_episodes = 1000          # Number of hands to practice
+n_episodes = 10000000          # Number of hands to practice
 start_epsilon = 1.0         # Start with 100% random actions
 epsilon_decay = start_epsilon / (n_episodes / 0.9)  # Reduce exploration over time
-final_epsilon = 0.01         # Make greedy
+final_epsilon = 0.05         # Keep some exploration
 
 env = gym.wrappers.RecordEpisodeStatistics(env, buffer_length=n_episodes)
 
