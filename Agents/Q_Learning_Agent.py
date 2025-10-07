@@ -65,8 +65,8 @@ class QLearningAgent(Agent):
             self.q_values[obs_key][action] + self.lr * temporal_difference
         )
 
-        # Track learning progress (useful for debugging)
-        self.training_error.append(temporal_difference)
+        # Too much memory: Track learning progress (useful for debugging)
+        # self.training_error.append(temporal_difference)
 
     def decay_epsilon(self):
         """Reduce exploration rate after each episode."""

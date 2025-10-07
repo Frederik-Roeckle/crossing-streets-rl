@@ -2,7 +2,6 @@ import numpy as np
 import gymnasium as gym
 import pickle
 from Agents.Q_Learning_Agent import QLearningAgent
-from Agents.SARSA_Agent import SARSAAgent
 
 gym.register(
     id="gymnasium_env/GridWorld-v0",
