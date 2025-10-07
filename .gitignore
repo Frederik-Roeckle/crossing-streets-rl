@@ -3,4 +3,5 @@ __pycache__/
 *.pkl
 *.json
 *.docx
+*.log
 output/*

@@ -29,7 +29,7 @@ class Agent():
             'lr': self.lr,
             'discount_factor': self.discount_factor,
             'final_epsilon': self.final_epsilon,
-            'training_error': self.training_error
+            # 'training_error': self.training_error
         }
         with open(filepath, 'wb') as f:
             pickle.dump(agent_state, f)
@@ -49,7 +49,7 @@ class Agent():
         self.lr = agent_state['lr']
         self.discount_factor = agent_state['discount_factor']
         self.final_epsilon = agent_state['final_epsilon']
-        self.training_error = agent_state['training_error']
+        # self.training_error = agent_state['training_error']
         print(f"Agent state loaded from {filepath}")
 
     def save_q_table_json(self, filepath):
@@ -121,7 +121,7 @@ class Agent():
                 'lr': float(self.lr),
                 'discount_factor': float(self.discount_factor),
                 'final_epsilon': float(self.final_epsilon),
-                'training_error': list(self.training_error) if hasattr(self.training_error, '__iter__') else []
+                # 'training_error': list(self.training_error) if hasattr(self.training_error, '__iter__') else []
             }
             
             # Save as JSON
@@ -130,7 +130,7 @@ class Agent():
             
             print(f"Agent state saved to JSON: {filepath}")
             print(f"Q-values: {len(q_values_json)} states")
-            print(f"Training errors: {len(agent_state['training_error'])} entries")
+            # print(f"Training errors: {len(agent_state['training_error'])} entries")
             
         except Exception as e:
             print(f"Error saving agent state to JSON: {e}")
@@ -155,7 +155,7 @@ class Agent():
             self.lr = agent_state['lr']
             self.discount_factor = agent_state['discount_factor']
             self.final_epsilon = agent_state['final_epsilon']
-            self.training_error = agent_state['training_error']
+            # self.training_error = agent_state['training_error']
             
             print(f"Agent state loaded from JSON: {filepath}")
             
