@@ -8,13 +8,13 @@ from tqdm import tqdm
 import logging
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[
-        logging.FileHandler('./output/training.log')  # Saves to file
-    ]
-)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(
+#     level=logging.INFO,
+#     handlers=[
+#         logging.FileHandler('./output/training.log')  # Saves to file
+#     ]
+# )
+# logger = logging.getLogger(__name__)
 
 
 # Register the environment so we can create it with gym.make()
@@ -28,7 +28,7 @@ env = gym.make("gymnasium_env/GridWorld-Mannheim", render_mode=None)
 
 # Training hyperparameters
 learning_rate = 0.1        # How fast to learn (higher = faster but less stable)
-n_episodes = 10000000          # Number of hands to practice
+n_episodes = 1000          # Number of hands to practice
 start_epsilon = 1.0         # Start with 100% random actions
 epsilon_decay = start_epsilon / (n_episodes / 0.9)  # Reduce exploration over time
 final_epsilon = 0.05         # Keep some exploration
@@ -49,22 +49,17 @@ for episode in tqdm(range(n_episodes)):
     total_reward = 0
 
     while not episode_over:
-        # Choose an action: 0 = push cart left, 1 = push cart right
-        action = agent.get_action(observation)  # Random action for now - real agents will be smarter!
+        action = agent.get_action(observation)  
         # Take the action and see what happens
         next_observation, reward, terminated, truncated, info = env.step(action)
 
         # update agents for QLearning
         agent.update(observation, action, reward, terminated, next_observation)
 
-        # print(info)
-        # env.render()
-
-        # total_reward += reward
         episode_over = terminated or truncated
         observation = next_observation
     agent.decay_epsilon()
-    logger.info(len(agent.q_values))
+    # logger.info(len(agent.q_values))
 
 print("Training finished")
 
@@ -72,6 +67,21 @@ print("saving agent")
 agent.save_agent_state_json("./output/q_agent.json")
 # agent.save_q_table_json("./output/q_learning_q_table.pkl")
 print("agent saved")
+
+# print("env return queue")
+# print(type(env.return_queue)) # <class 'collections.deque'>
+# print(len(env.return_queue)) # number of episodes
+# print(env.return_queue)     # deque object deque([-568.0000000000017, -609.0000000000017,...])
+
+# print("env.length_queue")
+# print(type(env.length_queue))
+# print(len(env.length_queue))
+# print(env.length_queue)
+
+# print("agent.training_error")
+# print(type(agent.training_error))
+# print(len(agent.training_error))
+# print(agent.training_error)
 
 
 

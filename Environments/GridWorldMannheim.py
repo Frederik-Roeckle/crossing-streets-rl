@@ -50,8 +50,8 @@ class GWMannheimEnv(gym.Env):
         self.size_width = size
 
         # for rendering
-        self.window_size_height = 300
-        self.window_size_width = 792
+        self.window_size_height = 130
+        self.window_size_width = 700
 
         # Init Agent and Target Location
         self.agent_position = np.array([-1, -1])
@@ -184,9 +184,13 @@ class GWMannheimEnv(gym.Env):
         """Start a new episode"""
         super().reset(seed=seed)
         
-        agent_pos, target_pos = self.sample_start_target_locations()
-        self.agent_position = np.array(agent_pos)
-        self.target_position = np.array(target_pos)
+        if not options["start_pos"] or not options["target_pos"]: 
+            agent_pos, target_pos = self.sample_start_target_locations()
+            self.agent_position = np.array(agent_pos)
+            self.target_position = np.array(target_pos)
+        else:
+            self.agent_position = np.array(options["start_pos"])
+            self.target_position = np.array(options["target_pos"])
 
         self.traffic_light_1_position = np.array(Crossings.TL_1_POSITION)
         self.traffic_light_2_position = np.array(Crossings.TL_2_POSITION)
@@ -336,6 +340,7 @@ class GWMannheimEnv(gym.Env):
             self.window = pygame.display.set_mode(
                 (self.window_size_width, self.window_size_height)
             )
+            pygame.display.set_caption("RL Crossing Streets")
             
         if self.clock is None and self.render_mode == "human":
             self.clock = pygame.time.Clock()
@@ -346,88 +351,73 @@ class GWMannheimEnv(gym.Env):
             self.window_size_width / self.size_width,
             self.window_size_height / self.size_height
         )
+        sprite_size = (34, 34)
+        castle_img = pygame.transform.scale(pygame.image.load("./imgs/castle.png"), sprite_size)
+        coffee_img = pygame.transform.scale(pygame.image.load("./imgs/hot-coffee.png"), sprite_size)
+        libray_img = pygame.transform.scale(pygame.image.load("./imgs/library.png"), sprite_size)
+        restaurant_img = pygame.transform.scale(pygame.image.load("./imgs/restaurant.png"), sprite_size)
+        store_img = pygame.transform.scale(pygame.image.load("./imgs/shopping-cart.png"), sprite_size)
+        robot_img = pygame.transform.scale(pygame.image.load("./imgs/robot.png"), sprite_size)
+        car_img = pygame.transform.scale(pygame.image.load("./imgs/car.png"), sprite_size)
+        red_light_img = pygame.transform.scale(pygame.image.load("./imgs/red-light.png"), sprite_size)
+        green_light_img = pygame.transform.scale(pygame.image.load("./imgs/traffic-light.png"), sprite_size)
 
         # draw the target
-        # TODO: show it as a nice motive and introduce nice images for the other 
-        pygame.draw.rect(
-            canvas,
-            (100, 100, 100),
-            pygame.Rect(
-                pix_size[0] * self.target_position[0],
-                pix_size[1] * self.target_position[1],
-                pix_size[0],
-                pix_size[1]               
-            )
-        )
+        # TODO: show it as a nice motive and introduce nice images for the other
+
+        if np.array_equal(self.target_position, Locations.CASTLE.value):
+            canvas.blit(castle_img, (pix_size[0] * self.target_position[0],
+                                     pix_size[1] * self.target_position[1]))
+        elif np.array_equal(self.target_position, Locations.LIBRARY.value):
+            canvas.blit(libray_img, (pix_size[0] * self.target_position[0],
+                                     pix_size[1] * self.target_position[1]))
+        elif np.array_equal(self.target_position, Locations.MENSA.value):
+            canvas.blit(restaurant_img, (pix_size[0] * self.target_position[0],
+                                     pix_size[1] * self.target_position[1]))
+        elif np.array_equal(self.target_position, Locations.STORE.value):
+            canvas.blit(store_img, (pix_size[0] * self.target_position[0],
+                                     pix_size[1] * self.target_position[1]))
+        else:
+            canvas.blit(coffee_img, (pix_size[0] * self.target_position[0],
+                                     pix_size[1] * self.target_position[1]))
 
         # draw the agent
-        pygame.draw.rect(
-            canvas,
-            ((25*self.agent_illegal_move), 0, 255),
-            pygame.Rect(
-                pix_size[0] * self.agent_position[0],
-                pix_size[1] * self.agent_position[1],
-                pix_size[0],
-                pix_size[1]               
-            )
-        )
+        canvas.blit(robot_img, (pix_size[0] * self.agent_position[0], pix_size[1] * self.agent_position[1],))
+        
 
         # draw the traffic lights
-        pygame.draw.rect(
-            canvas,
-            (255, 0, 0) if self.traffic_light_1_current_light == 0 else (0, 255, 0),
-            pygame.Rect(
-                pix_size[0] * self.traffic_light_1_position[0],
-                pix_size[1] * self.traffic_light_1_position[1],
-                pix_size[0],
-                pix_size[1]               
-            )
-        )
+        if self.traffic_light_1_current_light == 0:
+            canvas.blit(red_light_img, (pix_size[0] * self.traffic_light_1_position[0],
+                                         pix_size[1] * self.traffic_light_1_position[1]))
+        else: 
+            canvas.blit(green_light_img, (pix_size[0] * self.traffic_light_1_position[0],
+                                         pix_size[1] * self.traffic_light_1_position[1]))
 
-        pygame.draw.rect(
-            canvas,
-            (255, 0, 0) if self.traffic_light_2_current_light == 0 else (0, 255, 0),
-            pygame.Rect(
-                pix_size[0] * self.traffic_light_2_position[0],
-                pix_size[1] * self.traffic_light_2_position[1],
-                pix_size[0],
-                pix_size[1]               
-            )
-        )
+        if self.traffic_light_2_current_light == 0:
+            canvas.blit(red_light_img, (pix_size[0] * self.traffic_light_2_position[0],
+                                         pix_size[1] * self.traffic_light_2_position[1]))
+        else: 
+            canvas.blit(green_light_img, (pix_size[0] * self.traffic_light_2_position[0],
+                                         pix_size[1] * self.traffic_light_2_position[1]))
 
-        pygame.draw.rect(
-            canvas,
-            (255, 0, 0) if self.traffic_light_2b_current_light == 0 else (0, 255, 0),
-            pygame.Rect(
-                pix_size[0] * self.traffic_light_2b_position[0],
-                pix_size[1] * self.traffic_light_2b_position[1],
-                pix_size[0],
-                pix_size[1]               
-            )
-        )
+        if self.traffic_light_2b_current_light == 0:
+            canvas.blit(red_light_img, (pix_size[0] * self.traffic_light_2b_position[0],
+                                         pix_size[1] * self.traffic_light_2b_position[1]))
+        else: 
+            canvas.blit(green_light_img, (pix_size[0] * self.traffic_light_2b_position[0],
+                                         pix_size[1] * self.traffic_light_2b_position[1]))
 
-        pygame.draw.rect(
-            canvas,
-            (255, 0, 0) if self.traffic_light_3_current_light == 0 else (0, 255, 0),
-            pygame.Rect(
-                pix_size[0] * self.traffic_light_3_position[0],
-                pix_size[1] * self.traffic_light_3_position[1],
-                pix_size[0],
-                pix_size[1]               
-            )
-        )
-
+        if self.traffic_light_3_current_light == 0:
+            canvas.blit(red_light_img, (pix_size[0] * self.traffic_light_3_position[0],
+                                         pix_size[1] * self.traffic_light_3_position[1]))
+        else: 
+            canvas.blit(green_light_img, (pix_size[0] * self.traffic_light_3_position[0],
+                                         pix_size[1] * self.traffic_light_3_position[1]))
         # street crossing
-        pygame.draw.rect(
-            canvas,
-            (220, 220, 120) if self.street_crossing_3_status == 1 else (0, 0, 0),
-            pygame.Rect(
-                pix_size[0] * self.street_crossing_3_position[0],
-                pix_size[1] * self.street_crossing_3_position[1],
-                pix_size[0],
-                pix_size[1]               
-            )
-        )
+
+        if self.street_crossing_3_status == 0:
+            canvas.blit(car_img, (pix_size[0] * self.street_crossing_3_position[0],
+                                         pix_size[1] * self.street_crossing_3_position[1]))
 
         # TODO: draw all non-accessible areas
 
