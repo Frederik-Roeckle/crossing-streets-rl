@@ -13,7 +13,7 @@ I choose start and target locations who are the most common places for students.
 The light sequences are arbitrary choosen and doesn't reflect real-world conditions.
 
 # Results
-![Pygame Env](https://github.com/Frederik-Roeckle/crossing-streets-rl/tree/master/imgs/RL_pygame_env.gif)
+![Pygame Env](https://github.com/Frederik-Roeckle/crossing-streets-rl/blob/master/imgs/RL_pygame_env.gif)
 
 ## Training
 ### Training in Docker Container
